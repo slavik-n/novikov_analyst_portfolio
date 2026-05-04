@@ -6,11 +6,11 @@
 ---
 
 ## Навыки
-BPMN 2.0, UML, SQL, REST, Swagger, Jira, Confluence, PlantUML, Python
+BPMN 2.0, UML, SQL, REST, Swagger, Jira, Confluence, PlantUML
 
 ---
 
-## 📁 Проекты
+## Проекты
 *Примеры артефактов из реальных рабочих задач (данные анонимизированы)*
 ### [1. AI-помощник с RAG для корпоративной базы знаний](./0ai-assistant-rag)
 Проектирование интеграции LLM+RAG с базой знаний заказчика.
@@ -23,7 +23,7 @@ BPMN 2.0, UML, SQL, REST, Swagger, Jira, Confluence, PlantUML, Python
 
 ---
 
-## 📬 Контакты
+## Контакты
 📧 novis2@yandex.ru  
 📱 +7 985 492-17-73  
 ✈️ @v_novikov  
