@@ -1,0 +1,749 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: API приложения "Слово дня"
+  description: Описание API для приложения "Слово дня"
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/NOVIS2_1/WordOfTheDay/1.0.0
+
+paths:
+  /catalog:
+    get:
+      summary: Получение каталога с доступными наборами слов для обучения
+      tags:
+        - Каталог
+      parameters: 
+        - name: language
+          in: query
+          required: false
+          description: Изучаемый язык
+          schema:
+            type: string
+            enum: [en, de, fr, es, it, zh]
+            example: 'en'
+        - name: level
+          in: query
+          required: false
+          description: Уровень обучения
+          schema:
+            type: string
+            enum: [beginner, preintermediate, intermediate, advanced]
+            example: intermediate
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors:
+                    type: array
+                    items: 
+                      type: string
+                    example: []
+                  result:
+                    properties:
+                      wordLists:
+                        description: Список доступных наборов слов
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CatalogListItem'
+                      meta:
+                        type: object
+                        properties:
+                          totalCount:
+                            type: integer
+                            example: 100
+                          pageSize:
+                            type: integer
+                            example: 20
+                          currentOffset:
+                            type: integer
+                            example: 0
+        400:
+          $ref: '#/components/responses/400BadRequest'
+  /catalog/details/{catalogListId}:
+    get:
+      summary: Получение информации по выбранному набору слов
+      tags:
+        - Каталог
+      parameters:
+        - name: catalogListId
+          in: path
+          required: true
+          description: ID заведённого набора слов
+          schema:
+            type: integer
+            example: 123
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors:
+                    type: array
+                    items: 
+                      type: string
+                    example: []
+                  result:
+                    $ref: '#/components/schemas/CatalogListItemDetails'
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        example: 150
+                      pageSize:
+                        type: integer
+                        example: 50
+                      currentOffset:
+                        type: integer
+                        example: 0
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/catalog/{catalogListId}/addToProfile:
+    post:
+      summary: Добавление набора слов в профиль пользователя
+      tags:
+        - Каталог
+        - Пользовательские словари
+      parameters:
+        - name: catalogListId
+          in: path
+          required: true
+          description: ID заведённого набора слов
+          schema:
+            type: integer
+            example: 123
+      responses:
+        201:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Словарь успешно добавлен в профиль
+                  userListId:
+                    type: integer
+                    example: 345
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists:
+    get:
+      summary: Получение списка словарей, добавленных в профиль пользователя
+      tags:
+        - Пользовательские словари
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors:
+                    type: array
+                    items: 
+                      type: string
+                    example: []
+                  result:
+                    properties:
+                      wordLists:
+                        description: Список словарей в профиле пользователя
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserListItem'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}:
+    get:
+      summary: Получение информации по словарю из профиля пользователя
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors:
+                    type: array
+                    items: 
+                      type: string
+                    example: []
+                  result:
+                    $ref: '#/components/schemas/UserListItemDetails'
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        example: 150
+                      pageSize:
+                        type: integer
+                        example: 50
+                      currentOffset:
+                        type: integer
+                        example: 0
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}/setArchive:
+    post:
+      summary: Архивация словаря в профиле пользователя
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Словарь помечен, как архивный
+                  userListId:
+                    type: integer
+                    example: 345
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}/setActive:
+    post:
+      summary: Установка словаря, как активного
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Словарь помечен активным
+                  userListId:
+                    type: integer
+                    example: 345        
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}/addWord:
+    post:
+      summary: Добавление слова в словарь
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+      requestBody:
+        required: true
+        description: Данные добавляемого слова
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  description: Слово на исходном языке
+                  example: "apple"
+                  minLength: 1
+                  maxLength: 100
+                translation:
+                  type: string
+                  description: Перевод слова
+                  example: "яблоко"
+                  minLength: 1
+                  maxLength: 100
+                example:
+                  type: string
+                  description: Пример употребления
+                  example: The boy likes to eat an apple every morning.
+              required:
+                - value
+                - translation
+      responses:
+        201:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWord'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}/word/{userWordId}:
+    put:
+      summary: Изменение карточки слова в пользовательском словаре
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+        - name: userWordId
+          in: path
+          required: true
+          description: ID изменяемого слова
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        description: |
+          Изменённые данные слова.  
+          Изменять можно только слова `userAdded = true` (добавленные пользователем).
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  description: Слово на исходном языке
+                  example: "apple"
+                  minLength: 1
+                  maxLength: 100
+                translation:
+                  type: string
+                  description: Перевод слова
+                  example: "яблоко"
+                  minLength: 1
+                  maxLength: 100
+                example:
+                  type: string
+                  description: Пример употребления
+                  example: The boy likes to eat an apple every morning.
+              required:
+                - value
+                - translation
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Слово успешно изменено
+                  userWordId:
+                    type: string
+                    format: uuid
+        403:
+          description: Попытка изменить слово из исходного словаря
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Запрещено изменять слова из исходного словаря"
+                  code:
+                    type: string
+                    example: "FORBIDDEN_MODIFICATION"
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      summary: Удаление слова из пользовательского словаря
+      tags:
+        - Пользовательские словари
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+        - name: userWordId
+          in: path
+          required: true
+          description: ID удаляемого слова
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Слово успешно удалено
+        403:
+          description: Попытка удалить слово из исходного словаря
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Запрещено удалять слова из исходного словаря"
+                  code:
+                    type: string
+                    example: "FORBIDDEN_MODIFICATION"
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lesson:
+    get:
+      summary: Генерация нового урока
+      description: Возвращает сгенерированный урок в формате JSON.
+      tags:
+        - Уроки
+      parameters:
+        - name: userListId
+          in: query
+          description: ID словаря для урока (если не указан - используется активный)
+          schema:
+            type: integer
+            example: 345
+      responses:
+        200:
+          description: Успешно сгенерированный урок в формате JSON
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lesson/complete:
+    post:
+      summary: Отправка результатов урока
+      description: Отправка результатов урока в формате JSON
+      tags:
+        - Уроки
+      parameters:
+        - name: userListId
+          in: query
+          description: ID словаря для урока (если не указан - используется активный)
+          schema:
+            type: integer
+            example: 345
+      requestBody:
+        required: true
+        description: Результаты урока в формате json
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Результаты урока успешно отправлены
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /user/lists/{userListId}/stats:
+    get:
+      summary: Получение детальной статистики по словам из пользовательского словаря
+      tags:
+        - Статистика
+      parameters:
+        - name: userListId
+          in: path
+          required: true
+          description: ID пользовательского словаря
+          schema:
+            type: integer
+            example: 345
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                properties:
+                  errors:
+                    type: array
+                    items: 
+                      type: string
+                    example: []
+                  result:
+                    properties:
+                      words:
+                        description: Список слов с расширенными данными по статистике
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserWordStats'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'
+        
+      
+components:
+  schemas:
+    CatalogListItem:
+      description: Базовая информация по набору слов
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        name:
+          type: string
+          example: "Слова с курса английского для начинающих"
+        language:
+          type: string
+          enum: [en, de, fr, es, it, zh]
+          example: 'en'
+        level:
+            type: string
+            enum: [beginner, preintermediate, intermediate, advanced]
+            example: intermediate        
+        wordsCount:
+          type: integer
+          description: Число слов в наборе
+          example: 200
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+    CatalogListItemDetails:
+      allOf:
+      - $ref: '#/components/schemas/CatalogListItem'
+      - properties:
+          words:
+            type: array
+            items:
+              $ref: '#/components/schemas/Word'
+    UserListItem:
+      allOf:
+      - $ref: '#/components/schemas/CatalogListItem'
+      - properties:
+          isArchive:
+            type: boolean
+            example: false
+          isActive:
+            type: boolean
+            example: true
+          learnedWords:
+            type: integer
+            example: 10
+    UserListItemDetails:
+      allOf:
+      - $ref: '#/components/schemas/CatalogListItem'
+      - properties:
+          words:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserWord'
+    Word:
+      description: Слово из набора слов в каталоге
+      type: object
+      properties:
+        value:
+          type: string
+          description: Слово на изучаемом языке
+          example: 'table'
+        translation:
+          type: string
+          description: Перевод слова на русский язык
+          example: 'стол'
+    UserWord:
+      description: Слово из пользовательского словаря
+      allOf:
+      - $ref: '#/components/schemas/Word'
+      - type: object
+        properties:
+          userWordId:
+            type: string
+            format: uuid
+            readOnly: true
+          userAdded:
+            type: boolean
+            description: Флаг для слов, которые пользователь добавил самостоятельно
+            example: false
+            readOnly: true
+          memorizationStatus:
+            type: string
+            enum: [new, learning, learned, mastered, forgotten]
+            example: new
+          nextPracticeTime:
+            type: string
+            format: date-time
+            description: "Время следующего повторения слова"
+          example:
+            type: string
+            description: Пример употребления
+            example: The book is on the table.
+            nullable: true
+          transcription:
+            type: string
+            description: Транскрипция слова в МФА или другом фонетическом алфавите
+            example: '[ˈteɪb(ə)l]'
+            nullable: true
+          audioUrl:
+            type: string
+            format: uri
+            nullable: true
+          imageUrl:
+            type: string
+            format: uri
+            nullable: true
+    UserWordStats:
+      description: Слово из пользовательского словаря со статистикой
+      allOf:
+        - $ref: '#/components/schemas/UserWord'
+        - type: object
+          properties:
+            tasksCount:
+              type: integer
+              description: Количество заданий по этому слову
+              example: 11
+            rightAnswersCount:
+              type: integer
+              description: Количество правильных ответов по этому слову
+              example: 8
+            successRate:
+              type: number
+              format: float
+              description: Процент правильных ответов
+              example: 72.7
+  responses:
+    400BadRequest:
+      description: Неверные параметры запроса
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Неверные параметры запроса"
+              code:
+                type: string
+                example: "BAD REQUEST"
+    404NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Resource not found
+              code:
+                type: string
+                example: "NOT FOUND"
